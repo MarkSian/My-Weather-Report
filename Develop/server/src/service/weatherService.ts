@@ -3,15 +3,15 @@ dotenv.config();
 
 // TODO: Define an interface for the Coordinates object
 interface Coordinates {
-  lat: number;
-  lon: number;
+  lat: number; // Latitude of the location
+  lon: number; // Longitude of the location
 }
 
 // TODO: Define a class for the Weather object
 class Weather {
-  temperature: number;
-  description: string;
-  forecast: string[];
+  temperature: number; // Current temperature
+  description: string; // Weather description (e.g., sunny, cloudy)
+  forecast: string[]; // Array of weather forecasts
 
   constructor(temperature: number, description: string, forecast: string[]) {
     this.temperature = temperature;
@@ -23,31 +23,33 @@ class Weather {
 // TODO: Complete the WeatherService class
 class WeatherService {
   // TODO: Define the baseURL, API key, and city name properties
-  private baseURL: string = process.env.API_BASE_URL || '';
-  private apiKey: string = process.env.OPENWEATHER_API_KEY || '';
+  private baseURL: string = process.env.API_BASE_URL || ''; // Base URL for the API
+  private apiKey: string = process.env.API_KEY || ''; // API key for authentication
+
+
   // TODO: Create fetchLocationData method
   private async fetchLocationData(query: string): Promise<Coordinates> {
-    const geocodeQuery = this.buildGeocodeQuery(query);
+    const geocodeQuery = this.buildGeocodeQuery(query); // Build the geocode query
     console.log('Geocode query:', geocodeQuery);
-    const response = await fetch(geocodeQuery);
+    const response = await fetch(geocodeQuery); // Fetch location data
 
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Fetch error:', response.status, response.statusText, errorText);
-      throw new Error('Failed to fetch location data');
+      throw new Error('Failed to fetch location data'); // Handle fetch error
     }
-    const data = await response.json();
+    const data = await response.json(); // Parse the JSON response
     console.log('API response:', data);
 
     if (data.length === 0) {
-      throw new Error('Location not found');
+      throw new Error('Location not found'); // Handle case where no location is found
     }
-    return this.destructureLocationData(data[0]);
+    return this.destructureLocationData(data[0]); // Extract coordinates from the data
   }
   // TODO: Create destructureLocationData method
   private destructureLocationData(locationData: any): Coordinates {
     if (!locationData.lat || !locationData.lon) {
-      throw new Error('Invalid location data');
+      throw new Error('Invalid location data'); // Validate location data
     }
     return {
       lat: locationData.lat,
@@ -56,24 +58,24 @@ class WeatherService {
   }
   // TODO: Create buildGeocodeQuery method
   private buildGeocodeQuery(city: string): string {
-    const query = `${this.baseURL}/geo/1.0/direct?q=${encodeURIComponent(city)}&appid=${this.apiKey}`;
+    const query = `${this.baseURL}/geo/1.0/direct?q=${encodeURIComponent(city)}&appid=${this.apiKey}`; // Construct the geocode query
     console.log('Geocode query:', query);
-    return query;
+    return query; // Return the constructed query
   }
   // TODO: Create buildWeatherQuery method
   private buildWeatherQuery(coordinates: Coordinates): string {
-    const query = `${this.baseURL}/data/2.5/forecast?lat=${coordinates.lat}&lon=${coordinates.lon}&appid=${this.apiKey}`;
+    const query = `${this.baseURL}/data/2.5/forecast?lat=${coordinates.lat}&lon=${coordinates.lon}&appid=${this.apiKey}`; // Construct the weather query
     console.log('Weather query:', query);
     return query;
   }
   // TODO: Create fetchAndDestructureLocationData method
   private async fetchAndDestructureLocationData(city: string): Promise<Coordinates> {
     try {
-      const locationData = await this.fetchLocationData(city);
+      const locationData = await this.fetchLocationData(city); // Fetch location data
       return locationData;
     } catch (error) {
       console.error('Failed to fetch location data:', error);
-      throw error;
+      throw error; // Handle any errors during fetching
     }
   }
   // TODO: Create fetchWeatherData method
